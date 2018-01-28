@@ -26,8 +26,7 @@ router.get('/test', (req, res) => res.json({msg: 'upload Works!'}));
 // @access  public
 router.post("/question", (req, res) => {
    upload(req, res, (err) => {
-      console.log("Request ---", req.body);
-      console.log("Request file ---", req.file);//Here you get file.
+      // image is stored in req.file
       /*Now do where ever you want to do*/
       if(err) return res.status(400).json({error: err});
       return res.status(200).json({upload: req.file});
