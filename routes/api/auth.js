@@ -1,4 +1,4 @@
-const express = require('express'); 
+const express = require('express');
 const router = express.Router();
 // const gravatar = require('gravatar');
 const bcrypt = require('bcryptjs');
@@ -17,7 +17,7 @@ const User = require('../../models/User');
 // @route   GET api/users/test
 // @desc    Tests users route
 // @access  public
-router.get('/test', (req, res) => res.json({msg: 'users Works!'})); 
+router.get('/test', (req, res) => res.json({msg: 'users Works!'}));
 
 
 // @route   POST api/users/register
@@ -27,21 +27,21 @@ router.post('/register', (req, res) => {
     // Validate the inputs
     const {errors, isValid} = validateRegisterInput(req.body);
     // Check Validation Errors
-    
+
     if (!isValid) {
         return res.status(400).json(errors);
     }
-    
+
     User.findOne({email: req.body.email})
         .then(user => {
             if(user) {
-                return res.status(400).json({email: 'Email already exits'});
+                const errors = {email: 'Email already exists'};
+                return res.status(400).json({errors});
             } else {
                 // const avatar = gravatar
                 const newUser = new User({
                     name: req.body.name,
                     email: req.body.email,
-                    gender: req.body.gender,
                     password: req.body.password,
                     avatar: 'test/for/now/png',
                     date: Date.now()
@@ -70,7 +70,7 @@ router.post('/login', (req, res) => {
     if (!isValid) {
         return res.status(400).json({errors}); //.status(404)
     }
-    
+
     const {email, password} = req.body;
 
     // Find user by email
