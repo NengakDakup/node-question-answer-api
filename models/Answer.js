@@ -2,26 +2,24 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 // Create Schema
-const QuestionSchema = new Schema({
+const AnswerSchema = new Schema({
     user: {
         type: Schema.Types.ObjectId,
         ref: 'users'
     },
-    question_title: {
-        type: String,
-        required: true
-    },
-    category_id: {
-        type: String,
-    },
     body: {
-        type: String
-    },
-    slug: {
         type: String,
         required: true
     },
-    likes: [
+    upvotes: [
+      {
+        user: {
+          type: Schema.Types.ObjectId,
+          ref: 'users'
+        }
+      }
+    ],
+    downvotes: [
       {
         user: {
           type: Schema.Types.ObjectId,
@@ -50,32 +48,15 @@ const QuestionSchema = new Schema({
 
       }
     ],
-    answers: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: 'answers'
-      }
-    ],
-    best_answer: {
-      type: Schema.Types.ObjectId,
-      ref: 'answers'
-    },
     status: {
       type: Boolean,
       default: true
-    },
-    tags: {
-      type: String
-    },
-    image: {
-      type: String
     },
     date: {
       type: Date,
       default: Date.now
     }
-
 })
 
-const Question = mongoose.model('questions', QuestionSchema);
-module.exports = Question;
+const Answer = mongoose.model('answers', AnswerSchema);
+module.exports = Answer;
