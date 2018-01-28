@@ -6,11 +6,11 @@ const cors = require('cors');
 
 const auth = require('./routes/api/auth');
 const profile = require('./routes/api/profile');
-const posts = require('./routes/api/posts');
+const question = require('./routes/api/question');
 
 const app = express();
 
-// Enable cors
+// Enable cors middleware
 app.use(cors());
 
 // Body parser middleware
@@ -34,11 +34,10 @@ require('./config/passport')(passport);
 // Use Routes
 app.use('/api/auth', auth);
 app.use('/api/profile', profile);
-app.use('/api/posts', posts);
+app.use('/api/question', question);
 
 const port = process.env.PORT || 5000;
 
 app.listen(port, () => {
     console.log(`App has Started on port ${port}`);
 });
-

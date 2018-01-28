@@ -7,32 +7,58 @@ const ProfileSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'users'
     },
-    
-    name: {
+    username: {
         type: String,
-        required: true
+        required: true,
+        max: 40
     },
-    email: {
-        type: String,
-        required: true
+    date_of_birth: {
+        type: Date,
     },
     gender: {
         type: String,
         required: true
     },
-    password: {
-        type: String,
-        required: true
+    telephone: {
+        type: Number,
     },
-    avatar: {
+    country: {
         type: String
     },
+    followers: [
+      {
+        user: {
+          type: Schema.Types.ObjectId,
+          ref: 'users'
+        }
+      }
+    ],
+    social: {
+      facebook: {
+        type: String
+      },
+      twitter: {
+        type: String
+      },
+      instagram: {
+        type: String
+      },
+      linkedin: {
+        type: String
+      },
+    },
+    image: {
+      type: String
+    },
+    bio: {
+      type: String
+    },
     date: {
-        type: Date,
-        required: true
+      type: Date,
+      default: Date.now
     }
 
 })
 
-const User = mongoose.model('profiles', ProfileSchema);
-module.exports = User;
+const Profile = mongoose.model('profiles', ProfileSchema);
+module.exports = Profile;

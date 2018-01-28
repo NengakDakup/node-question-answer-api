@@ -113,7 +113,7 @@ router.get('/current', passport.authenticate('jwt', { session: false}), (req, re
         id: req.user.id,
         name: req.user.name,
         email: req.user.email,
-        gender: req.user.gender
+        avatar: req.user.avatar
     });
 });
 
