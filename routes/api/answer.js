@@ -161,7 +161,7 @@ router.post('/comment/add', passport.authenticate('jwt', { session: false }), (r
       if(!profile) return res.json({noprofile: 'User not found'});
       Answer.findOne({_id: req.body.answer_id})
         .then(answer => {
-          if(!answer) return res.json({noprofile: 'Answer not found'});
+          if(!answer) return res.json({noanswer: 'Answer not found'});
           //save the comment
           answer.comments.unshift(commentFields);
           // save the answer
@@ -173,8 +173,25 @@ router.post('/comment/add', passport.authenticate('jwt', { session: false }), (r
 // @route   POST api/answer/comment/delete
 // @desc    Delete a comment on an answer
 // @access  private
-router.post('/comment/add', passport.authenticate('jwt', { session: false }), (req, res) => {
-  
+router.post('/comment/delete', passport.authenticate('jwt', { session: false }), (req, res) => {
+  //answer_id and comment_id
+  //check if user exists
+  User.findOne({_id: req.user.id})
+    .then(profile => {
+      if(!profile) return res.json({noprofile: 'User not found'});
+      Answer.findOne({_id: req.body.answer_id})
+        .then(answer => {
+          if(!answer) return res.json({noanswer: 'Answer not found'});
+          //check if comment exists
+          if(!answer.comments.filter(comment => comment._id.toString() === req.body.comment_id).length > 0) res.json({nocomment: 'Comment does not exist'})
+          // Get the remove index
+          const removeIndex = answer.comments.map(comment => comment._id.toString()).indexOf(req.body.comment_id);
+          // Splice it out of the array
+          answer.comments.splice(removeIndex, 1);
+          // save the answer
+          answer.save().then(answer => res.json(answer))
+        }).catch(err => res.json({noanswer: 'Answer not found'}))
+    }).catch(err => res.json({nouser: 'User not found'}))
 })
 
 
