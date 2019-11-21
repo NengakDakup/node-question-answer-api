@@ -36,6 +36,20 @@ router.get('/:id', (req, res) => {
     .catch(err => res.json({noquestion: 'Question not found'}));
 })
 
+// @route   GET api/question/slug/:slug
+// @desc    Gets a particular question by slug
+// @access  public
+router.get('/slug/:slug', (req, res) => {
+  const errors = {};
+  Question.findOne({slug: req.params.slug})
+    .populate('answer', ['user', 'body'])
+    .then(question => {
+      if(!question) return res.status(400).json({noquestion: 'Question Not found'});
+      return res.json(question);
+    })
+    .catch(err => res.status(404).json({noquestion: 'Question not found'}));
+})
+
 // @route   GET api/question
 // @desc    Gets all questions
 // @access  public
