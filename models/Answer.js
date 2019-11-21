@@ -7,6 +7,10 @@ const AnswerSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'users'
     },
+    question: {
+      type: Schema.Types.ObjectId,
+      ref: 'users'
+    },
     body: {
         type: String,
         required: true

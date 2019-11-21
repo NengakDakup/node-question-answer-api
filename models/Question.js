@@ -29,31 +29,12 @@ const QuestionSchema = new Schema({
         }
       }
     ],
-    comments: [
-      {
-        user: {
-          type: Schema.Types.ObjectId,
-          ref: 'users'
-        },
-        text: {
-          type: String,
-          required: true
-        },
-        avatar: {
-          type: String,
-          required: true
-        },
-        date: {
-          type: Date,
-          default: Date.now
-        }
-
-      }
-    ],
     answers: [
       {
-        type: Schema.Types.ObjectId,
-        ref: 'answers'
+        answer: {
+          type: Schema.Types.ObjectId,
+          ref: 'answers'
+        }
       }
     ],
     best_answer: {

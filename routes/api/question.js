@@ -28,7 +28,7 @@ router.get('/test', (req, res) => res.json({msg: 'question Works!'}));
 router.get('/:id', (req, res) => {
   const errors = {};
   Question.findOne({_id: req.params.id})
-    .populate('user', ['name', 'avatar'])
+    .populate('answer', ['user', 'body'])
     .then(question => {
       if(!question) return res.status(400).json({noquestion: 'Question Not found'});
       return res.json(question);
