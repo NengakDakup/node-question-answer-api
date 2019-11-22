@@ -19,7 +19,7 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
 // DB Config
-const db = require('./config/keys').localURI;
+const db = require('./config/keys').MONGODB_URI;
 
 // Connect to the mongodb
 mongoose.connect(process.env.MONGODB_URI || db, { useNewUrlParser: true, useUnifiedTopology: true })
