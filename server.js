@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const cors = require('cors');
 
+require('dotenv').config();
+
 const auth = require('./routes/api/auth');
 const profile = require('./routes/api/profile');
 const question = require('./routes/api/question');
@@ -19,10 +21,10 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
 // DB Config
-const db = require('./config/keys').MONGODB_URI;
+const db = require('./config/keys').mongoURI;
 
 // Connect to the mongodb
-mongoose.connect(process.env.MONGODB_URI || db, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(db || process.env.mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log("MongoDB Connected"))
     .catch((err) => console.log(err));
 
