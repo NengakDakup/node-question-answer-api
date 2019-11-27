@@ -63,7 +63,7 @@ router.get('/', (req, res) => {
         return res.status(404).json(errors);
       }
 
-      return res.json(questions);
+      return res.json(questions.reverse());
     })
     .catch(err => res.status(404).json({noquestions: 'There are no questions'}));
 });

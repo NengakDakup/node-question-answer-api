@@ -11,7 +11,7 @@ module.exports = function validateQuestionInput(data) {
     data.image = !isEmpty(data.image) ? data.image : '';
 
     if (Validator.isEmpty(data.question_title)){
-        errors.question_title = 'Question Title is required';
+        errors.title = 'Question Title is required';
     }
 
     if(!isEmpty(data.body)){

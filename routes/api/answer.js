@@ -39,7 +39,7 @@ router.post('/create', passport.authenticate('jwt', { session: false }), (req, r
 
   //check if user exists
   // Check if user exists
-  User.findOne({_id: req.user.id}).then(profile => {
+  Profile.findOne({user: req.user.id}).then(profile => {
     // Check if question-slug exists
     Question.findOne({_id: answerFields.question}).then(question => {
       if (question){
@@ -71,7 +71,7 @@ router.post('/create', passport.authenticate('jwt', { session: false }), (req, r
 router.post('/upvote/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
   const errors = {};
   //check if user profile exists
-  User.findOne({_id: req.user.id}).then(profile => {
+  Profile.findOne({user: req.user.id}).then(profile => {
     Answer.findOne({_id: req.params.id}).then(answer => {
       if(!answer) res.json({noanswer: 'Answer not found'});
         //check if question is already upvoted
@@ -108,7 +108,7 @@ router.post('/upvote/:id', passport.authenticate('jwt', { session: false }), (re
 router.post('/downvote/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
   const errors = {};
   //check if user profile exists
-  User.findOne({_id: req.user.id}).then(profile => {
+  Profile.findOne({user: req.user.id}).then(profile => {
     Answer.findOne({_id: req.params.id}).then(answer => {
       if(!answer) res.json({noanswer: 'Answer not found'});
         //check if question is already downvoted
@@ -156,7 +156,7 @@ router.post('/comment/add', passport.authenticate('jwt', { session: false }), (r
   if(req.body.answer_id) commentFields.question = req.body.answer_id;
 
   //check if user exists
-  User.findOne({_id: req.user.id})
+  Profile.findOne({user: req.user.id})
     .then(profile => {
       if(!profile) return res.json({noprofile: 'User not found'});
       Answer.findOne({_id: req.body.answer_id})
@@ -176,7 +176,7 @@ router.post('/comment/add', passport.authenticate('jwt', { session: false }), (r
 router.post('/comment/delete', passport.authenticate('jwt', { session: false }), (req, res) => {
   //answer_id and comment_id
   //check if user exists
-  User.findOne({_id: req.user.id})
+  Profile.findOne({user: req.user.id})
     .then(profile => {
       if(!profile) return res.json({noprofile: 'User not found'});
       Answer.findOne({_id: req.body.answer_id})
