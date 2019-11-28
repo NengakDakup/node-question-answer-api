@@ -130,8 +130,10 @@ router.post('/create', passport.authenticate('jwt', { session: false }), (req, r
 router.delete('/delete/:id', passport.authenticate('jwt', { session: false}), (req, res) => {
   // first check if user profile exists
   Profile.findOne({user: req.user.id}).then(profile => {
+    // wtf i need to check if the question was posted by the user
     Question.findOne({_id: req.params.id})
       .then(question => {
+        // if question.user === req.user.is then delete the question else return an error
         Question.remove({_id: req.params.id}).then(msg => res.json(msg));
       })
   })

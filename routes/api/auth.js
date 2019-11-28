@@ -35,7 +35,7 @@ router.post('/register', (req, res) => {
     User.findOne({email: req.body.email})
         .then(user => {
             if(user) {
-                const errors = {email: 'Email already exists'};
+                errors.email = 'Email already exists';
                 return res.status(400).json({errors});
             } else {
                 // const avatar = gravatar
@@ -90,7 +90,8 @@ router.post('/login', (req, res) => {
                         // Create the payload
                         const payload = { id: user.id, name: user.name, avatar: user.avatar };
                         // Sign the Token
-                        jwt.sign(payload, keys.JWTKey, {expiresIn: 3600}, (err, token) => {
+                        // expires in one week
+                        jwt.sign(payload, keys.JWTKey, {expiresIn: 604800}, (err, token) => {
                             res.json({
                                 reply: 'Success',
                                 token: 'Bearer ' + token
