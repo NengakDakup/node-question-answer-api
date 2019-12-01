@@ -18,6 +18,10 @@ const UserSchema = new Schema({
     avatar: {
         type: String
     },
+    status: {
+        type: Number,
+        default: 1
+    },
     date: {
         type: Date,
         required: true

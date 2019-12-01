@@ -30,6 +30,7 @@ router.get('/:id', (req, res) => {
   Question.findOne({_id: req.params.id})
     .populate('answer', ['user', 'body'])
     .then(question => {
+      .populate('user', ['name', 'email'])
       if(!question) return res.status(400).json({noquestion: 'Question Not found'});
       return res.json(question);
     })

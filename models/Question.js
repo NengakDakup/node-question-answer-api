@@ -42,8 +42,8 @@ const QuestionSchema = new Schema({
       ref: 'answers'
     },
     status: {
-      type: Boolean,
-      default: true
+      type: Number,
+      default: 1
     },
     tags: {
       type: String
