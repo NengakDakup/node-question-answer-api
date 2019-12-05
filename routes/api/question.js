@@ -15,6 +15,8 @@ const Profile = require('../../models/Profile');
 const User = require('../../models/User');
 // Load Answer Model
 const Answer = require('../../models/Answer');
+// Load Report Model
+const Reported = require('../../models/Reported')
 
 // @route   GET api/question/test
 // @desc    Tests question route
@@ -30,7 +32,6 @@ router.get('/:id', (req, res) => {
   Question.findOne({_id: req.params.id})
     .populate('answer', ['user', 'body'])
     .then(question => {
-      .populate('user', ['name', 'email'])
       if(!question) return res.status(400).json({noquestion: 'Question Not found'});
       return res.json(question);
     })
@@ -144,7 +145,7 @@ router.delete('/delete/:id', passport.authenticate('jwt', { session: false}), (r
 // @desc    Like/Unlike a question
 // @access  private
 router.post('/like/:id', passport.authenticate('jwt', { session: false}), (req, res) => {
-  Profile.findOne({user: req.params.id}).then(profile => {
+  Profile.findOne({user: req.user.id}).then(profile => {
     Question.findById(req.params.id).then(question => {
       // check if question exists
       if(!question) res.json({noquestion: 'Question not found'})
@@ -163,6 +164,36 @@ router.post('/like/:id', passport.authenticate('jwt', { session: false}), (req, 
       }
     }).catch(err => res.json({noquestion: 'Question not found'}));
   }).catch(err => res.json({nouser: 'User not found'}));
+})
+
+// @route   POST api/question/report/:id
+// @desc    Report a question
+// @access  private
+router.post('/report/:id', passport.authenticate('jwt', { session: false}), (req, res) => {
+  User.findById(req.user.id).then(user => {
+    const errors = {};
+    if(!user) {
+      errors.nouser = 'User not Found';
+      return res.status(404).json(errors);
+    }
+    // check if question exists
+    Question.findById(req.params.id).then(question => {
+      if(!question) {
+        errors.noquestion = 'Question not found';
+        return res.status(404).json(errors);
+      }
+
+      // set the report fileds
+      const reportFields = {};
+      reportFields.type = 'question';
+      reportFields.id = req.params.id;
+      reportFields.user = req.user.id;
+
+      // Save the report
+      new Reported(reportFields).save().then(reported => res.json(reported));
+
+    }).catch(err => res.json(err))
+  })
 })
 
 
