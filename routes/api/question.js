@@ -3,6 +3,10 @@ const router = express.Router();
 const mongoose = require('mongoose');
 const passport = require('passport');
 const escape_html = require('escape-html');
+const axios = require('axios');
+var multer  = require('multer')
+var upload = multer({ dest: '../../uploads/' })
+
 
 // Load Input Validation
 const validateQuestionInput = require('../../validation/question')
@@ -73,7 +77,7 @@ router.get('/', (req, res) => {
 // @route   POST api/question/create
 // @desc    Create or Edit user question
 // @access  private
-router.post('/create', passport.authenticate('jwt', { session: false }), (req, res) => {
+router.post('/create', upload.single('image'), passport.authenticate('jwt', { session: false }), (req, res) => {
   // Validate the inputs
   const {errors, isValid} = validateQuestionInput(req.body);
   // Check Validation Errors

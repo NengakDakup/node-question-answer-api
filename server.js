@@ -12,6 +12,7 @@ const profile = require('./routes/api/profile');
 const question = require('./routes/api/question');
 const answer = require('./routes/api/answer');
 const search = require('./routes/api/search');
+const upload = require('./routes/api/upload');
 
 const app = express();
 
@@ -23,10 +24,10 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
 // DB Config
-const db = require('./config/keys').mongoURI;
+const db = require('./config/keys').localURI;
 
 // Connect to the mongodb
-mongoose.connect(db || process.env.mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.mongoURI || db, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log("MongoDB Connected"))
     .catch((err) => console.log(err));
 
@@ -42,6 +43,8 @@ app.use('/api/profile', profile);
 app.use('/api/question', question);
 app.use('/api/answer', answer);
 app.use('/api/search', search);
+app.use('/api/upload', upload);
+app.use(express.static('public'));
 
 const port = process.env.PORT || 5000;
 
