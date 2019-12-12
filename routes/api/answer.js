@@ -26,11 +26,12 @@ router.get('/test', (req, res) => res.json({msg: 'answer Works!'}));
 // @access  private
 router.post('/create', passport.authenticate('jwt', { session: false }), (req, res) => {
   // Validate the inputs
-  const {errors, isValid} = validateAnswerInput(req.body);
+  const errors = {};
+  //const {errors, isValid} = validateAnswerInput(req.body);
   // Check Validation Errors
-  if (!isValid) {
-      return res.status(400).json(errors);
-  }
+  // if (!isValid) {
+  //     return res.status(400).json(errors);
+  // }
 
   const answerFields = {};
   answerFields.user = req.user.id;
@@ -63,6 +64,33 @@ router.post('/create', passport.authenticate('jwt', { session: false }), (req, r
     }).catch(err => console.log(err));
   }).catch(err => res.json({nouser: 'User does not exist'}));
 
+})
+
+// @route   GET api/answer/delete/:id
+// @desc    Delete an answer
+// @access  private
+router.get('/delete/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
+  res.status(200).json('working');
+})
+
+// @route   GET api/answer/for/:id
+// @desc    Get answers for a uestion
+// @access  public
+router.get('/for/:id', (req, res) => {
+  const errors = {};
+  const {id} = req.params;
+  Question.findById(id)
+    .then(question => {
+      if(!question) res.status(404).json({noquestion: 'Question not found'});
+      if(question){
+        Answer.find({question: id})
+          .populate('user', ['name', 'avatar'])
+          .then(answer => {
+            if(answer.length < 1) res.status(404).json({noanswers: 'No answers for this question'});
+            if(answer.length >= 1 ) res.json(answer);
+          })
+      }
+    })
 })
 
 // @route   POST api/answer/upvote/:id

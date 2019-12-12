@@ -11,7 +11,7 @@ const QuestionSchema = new Schema({
         type: String,
         required: true
     },
-    category_id: {
+    category: {
         type: String,
     },
     body: {
@@ -44,9 +44,6 @@ const QuestionSchema = new Schema({
     status: {
       type: Number,
       default: 1
-    },
-    tags: {
-      type: String
     },
     image: {
       type: String

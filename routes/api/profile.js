@@ -51,42 +51,43 @@ router.get('/all', (req, res) => {
     .catch(err => res.status(404).json({profile: 'There are no profiles'}));
 })
 
-// @route   GET api/profile/handle/:handle
+// @route   GET api/profile/handle/:username
 // @desc    Get Profile by handle
 // @access  public
-router.get('/user/:username', (req, res) => {
-  const errors = {};
-  Profile.findOne({username: req.params.username})
-    .populate('user', ['name', 'avatar'])
-    .then(profile => {
-      if(!profile) {
-        errors.noprofile = 'There is no profile for this user';
-        return res.status(400).json(errors);
-      }
-      res.json(profile);
-    })
-    .catch(err => {
-      errors.noprofile = 'There is no Profile for this user';
-      res.status(400).json(errors);
-    });
-})
+// router.get('/handle/:username', (req, res) => {
+//   const errors = {};
+//   Profile.findOne({username: req.params.username})
+//     .populate('user', ['name', 'avatar'])
+//     .then(profile => {
+//       if(!profile) {
+//         errors.noprofile = 'There is no profile for this user';
+//         return res.status(400).json(errors);
+//       }
+//       res.json(profile);
+//     })
+//     .catch(err => {
+//       errors.noprofile = 'There is no Profile for this user';
+//       res.status(400).json(errors);
+//     });
+// })
 
-// @route   GET api/profile/user/:user_id
-// @desc    Get Profile by handle
+// @route   GET api/profile/user/:id
+// @desc    Get Profile by id
 // @access  public
-router.get('/userid/:user_id', (req, res) => {
+router.get('/user/:id', (req, res) => {
   const errors = {};
-  Profile.findOne({user: req.params.user_id})
+  const {id} = req.params;
+  Profile.findOne({user: id})
     .populate('user', ['name', 'avatar'])
     .then(profile => {
-      if(!profile) {
-        errors.noprofile = 'There is no profile for this user';
-        return res.status(400).json(errors);
+      if(!profile){
+        errors.noprofile = 'User not Found';
+        return res.status(404).json(errors);
       }
-      res.json(profile);
+      if(profile) return res.json(profile);
     })
     .catch(err => {
-      errors.noprofile = 'There is no Profile for this user';
+      errors.noprofile = 'User not Found';
       res.status(400).json(errors);
     });
 })

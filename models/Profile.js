@@ -9,7 +9,6 @@ const ProfileSchema = new Schema({
     },
     username: {
         type: String,
-        required: true,
         max: 40
     },
     date_of_birth: {
@@ -17,7 +16,6 @@ const ProfileSchema = new Schema({
     },
     gender: {
         type: String,
-        required: true
     },
     telephone: {
         type: Number,

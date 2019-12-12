@@ -16,12 +16,10 @@ module.exports = function validateProfileInput(data) {
     data.instagram = !isEmpty(data.instagram) ? data.instagram : '';
     data.linkedin = !isEmpty(data.linkedin) ? data.linkedin : '';
 
-    if (Validator.isEmpty(data.username)){
-        errors.username = 'Username Field is required';
-    }
-
-    if (!Validator.isLength(data.username, {min: 4, max: 30})){
-        errors.username = 'Username must be between 4 and 30 characters';
+    if (!isEmpty(data.username)){
+      if (!Validator.isLength(data.username, {min: 4, max: 30})){
+          errors.username = 'Username must be between 4 and 30 characters';
+      }
     }
 
     if(!isEmpty(data.date_of_birth)){

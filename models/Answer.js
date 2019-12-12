@@ -12,7 +12,7 @@ const AnswerSchema = new Schema({
       ref: 'users'
     },
     body: {
-        type: String,
+        type: Object,
         required: true
     },
     upvotes: [

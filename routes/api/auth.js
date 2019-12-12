@@ -12,6 +12,7 @@ const validateLoginInput = require('../../validation/login')
 
 // Load User Model
 const User = require('../../models/User');
+const Profile = require('../../models/Profile');
 
 
 // @route   GET api/auth/test
@@ -52,7 +53,16 @@ router.post('/register', (req, res) => {
                         if(err) throw err;
                         newUser.password = hash;
                         newUser.save()
-                            .then(user => res.json(user))
+                            .then(user => {
+                              // create a profile for the user
+                              const profileFields = {};
+                              profileFields.user = user.id;
+                              // save the profile
+                              // Save the profile
+                              new Profile(profileFields).save().then(profile => {
+                                res.json(user);
+                              });
+                            })
                             .catch(err => console.log(err));
                     });
                 });

@@ -5,6 +5,7 @@ const passport = require('passport');
 const escape_html = require('escape-html');
 const axios = require('axios');
 var multer  = require('multer')
+const slugify = require('slugify');
 var upload = multer({ dest: '../../uploads/' })
 
 
@@ -91,8 +92,8 @@ router.post('/create', upload.single('image'), passport.authenticate('jwt', { se
   const questionFields = {};
   questionFields.user = req.user.id;
   if(req.body.question_title) questionFields.question_title = req.body.question_title;
-  if(req.body.question_title) questionFields.slug = req.body.question_title.toLowerCase().split(" ").join("-").replace( "?", "");
-  if(req.body.category_id) questionFields.category_id = req.body.category_id;
+  if(req.body.question_title) questionFields.slug = slugify(req.body.question_title.toLowerCase(), {remove: /[*+~.()'"!?:@]/g});
+  if(req.body.category) questionFields.category = req.body.category;
   if(req.body.tags) questionFields.tags = req.body.tags;
   if(req.body.body) questionFields.body = req.body.body;
   if(req.body.image) questionFields.image = req.body.image; //link to the image is th uploaded url
