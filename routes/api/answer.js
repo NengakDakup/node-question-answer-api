@@ -93,10 +93,10 @@ router.get('/for/:id', (req, res) => {
     })
 })
 
-// @route   POST api/answer/upvote/:id
+// @route   GET api/answer/upvote/:id
 // @desc    Upvote an answer
 // @access  private
-router.post('/upvote/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+router.get('/upvote/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
   const errors = {};
   //check if user profile exists
   Profile.findOne({user: req.user.id}).then(profile => {
@@ -105,7 +105,7 @@ router.post('/upvote/:id', passport.authenticate('jwt', { session: false }), (re
         //check if question is already upvoted
         if(answer.upvotes.filter(upvote => upvote.user.toString() === req.user.id).length > 0){
           //upvoted already:
-          return res.json({alreadyupvoted: 'Answer already upvoted'});
+          return res.status(400).json({alreadyupvoted: 'Answer already upvoted'});
         } else {
           //check if user downvoted the question
           if(answer.downvotes.filter(downvote => downvote.user.toString() === req.user.id).length > 0){
@@ -125,15 +125,15 @@ router.post('/upvote/:id', passport.authenticate('jwt', { session: false }), (re
             answer.save().then(answer => res.json(answer));
           }
         }
-    }).catch(err => res.json({noanswer: 'Answer does not exist'}))
-  }).catch(err => res.json({nouser: 'User does not exist'}))
+    }).catch(err => res.status(404).json({noanswer: 'Answer does not exist'}))
+  }).catch(err => res.status(404).json({nouser: 'User does not exist'}))
 })
 
 
-// @route   POST api/answer/downvote/:id
+// @route   GET api/answer/downvote/:id
 // @desc    Downvote an answer
 // @access  private
-router.post('/downvote/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+router.get('/downvote/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
   const errors = {};
   //check if user profile exists
   Profile.findOne({user: req.user.id}).then(profile => {
@@ -142,7 +142,7 @@ router.post('/downvote/:id', passport.authenticate('jwt', { session: false }), (
         //check if question is already downvoted
         if(answer.downvotes.filter(downvote => downvote.user.toString() === req.user.id).length > 0){
           //downvoted already:
-          return res.json({alreadydownvoted: 'Answer already downvoted'});
+          return res.status(400).json({alreadydownvoted: 'Answer already downvoted'});
         } else {
           //check if user upvoted the question
           if(answer.upvotes.filter(upvote => upvote.user.toString() === req.user.id).length > 0){
@@ -162,8 +162,8 @@ router.post('/downvote/:id', passport.authenticate('jwt', { session: false }), (
             answer.save().then(answer => res.json(answer));
           }
         }
-    }).catch(err => res.json({noanswer: 'Answer does not exist'}))
-  }).catch(err => res.json({nouser: 'User does not exist'}))
+    }).catch(err => res.status(404).json({noanswer: 'Answer does not exist'}))
+  }).catch(err => res.status(404).json({nouser: 'User does not exist'}))
 })
 
 // @route   POST api/answer/comment/add

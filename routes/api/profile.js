@@ -144,8 +144,31 @@ router.post('/create', passport.authenticate('jwt', { session: false }), (req, r
     }
 
   })
+})
 
-
+// @route   GET api/profile/follow/:id
+// @desc    Get the current users profile
+// @access  private
+router.get('/follow/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+  Profile.findOne({user: req.user.id}).then(profile => {
+    Profile.findOne({user: req.params.id}).then(profile => {
+      // check if question exists
+      if(!profile) res.json({noprofile: 'Profile not found'})
+      // check if post is liked or not, then act accordingly
+      if (profile.followers.filter(follower => follower.user.toString() === req.user.id).length > 0) {
+        // Get the remove index
+        const removeIndex = profile.followers.map(item => item.user.toString()).indexOf(req.user.id);
+        // Splice it out of the array
+        profile.followers.splice(removeIndex, 1);
+        // Save the post
+        profile.save().then(profile => res.json(profile));
+      } else {
+        //Add user likes to the array
+        profile.followers.unshift({user: req.user.id});
+        profile.save().then(followers => res.json(followers));
+      }
+    }).catch(err => res.json({noprofile: 'Profile not found'}));
+  }).catch(err => res.json({noprofile: 'Profile not found'}));
 })
 
 module.exports = router;

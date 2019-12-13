@@ -35,7 +35,7 @@ router.get('/test', (req, res) => res.json({msg: 'question Works!'}));
 router.get('/:id', (req, res) => {
   const errors = {};
   Question.findOne({_id: req.params.id})
-    .populate('answer', ['user', 'body'])
+    .populate('user answer')
     .then(question => {
       if(!question) return res.status(400).json({noquestion: 'Question Not found'});
       return res.json(question);
@@ -49,7 +49,7 @@ router.get('/:id', (req, res) => {
 router.get('/slug/:slug', (req, res) => {
   const errors = {};
   Question.findOne({slug: req.params.slug})
-    .populate('answer', ['user', 'body'])
+    .populate('user answer')
     .then(question => {
       if(!question) return res.status(400).json({noquestion: 'Question Not found'});
       return res.json(question);
@@ -92,7 +92,7 @@ router.post('/create', upload.single('image'), passport.authenticate('jwt', { se
   const questionFields = {};
   questionFields.user = req.user.id;
   if(req.body.question_title) questionFields.question_title = req.body.question_title;
-  if(req.body.question_title) questionFields.slug = slugify(req.body.question_title.toLowerCase(), {remove: /[*+~.()'"!?:@]/g});
+  if(req.body.question_title) questionFields.slug = slugify(req.body.question_title.toLowerCase(), {remove: /[*+~.,()'"!?:@]/g});
   if(req.body.category) questionFields.category = req.body.category;
   if(req.body.tags) questionFields.tags = req.body.tags;
   if(req.body.body) questionFields.body = req.body.body;
@@ -101,10 +101,12 @@ router.post('/create', upload.single('image'), passport.authenticate('jwt', { se
   // Check if user exists
   Profile.findOne({user: req.user.id}).then(profile => {
     // Check if question-slug exists
-    Question.findOne({slug: questionFields.slug}).then(question => {
+    Question.findOne({slug: questionFields.slug})
+    .populate('user')
+    .then(question => {
       if (question){
         // Check if question was created by the user
-        if (question.user == req.user.id) {
+        if (question.user._id.toString() === req.user.id.toString()) {
           // Update the question
           Question.findOneAndUpdate(
             { user: req.user.id},
@@ -139,9 +141,14 @@ router.delete('/delete/:id', passport.authenticate('jwt', { session: false}), (r
   Profile.findOne({user: req.user.id}).then(profile => {
     // wtf i need to check if the question was posted by the user
     Question.findOne({_id: req.params.id})
+      .populate('user')
       .then(question => {
-        // if question.user === req.user.is then delete the question else return an error
-        Question.remove({_id: req.params.id}).then(msg => res.json(msg));
+        // Check if question was posted by user
+        if ( question.user._id.toString() === req.user.id.toString() ) {
+          Question.remove({_id: req.params.id}).then(msg => res.json(msg));
+        } else {
+          return res.status(400).json({unauthorized: 'Unauthorized'});
+        }
       })
   })
 })
@@ -169,6 +176,42 @@ router.post('/like/:id', passport.authenticate('jwt', { session: false}), (req, 
       }
     }).catch(err => res.json({noquestion: 'Question not found'}));
   }).catch(err => res.json({nouser: 'User not found'}));
+})
+
+// @route   POST api/question/approve
+// @desc    Approve an answer as correct
+// @access  private
+router.post('/approve', passport.authenticate('jwt', {session: false}), (req, res) => {
+  User.findById(req.user.id).then(user => {
+    const errors = {};
+    if(!user){
+      errors.nouser = 'User not Found';
+      return res.status(404).json(errors);
+    }
+    const {questionId, answerId} = req.body;
+    Question.findById(questionId)
+    .populate('user')
+    .then(question => {
+      if(!question){
+        errors.noquestion = 'Question not Found';
+        return res.status(404).json(errors);
+      }
+
+      if(question.user._id.toString() !== req.user.id.toString()){
+        errors.unauthorized = 'Unauthorized';
+        return res.status(404).json(errors);
+      }
+
+      if(question.answers.filter(answer => answer.answer.toString() === answerId).length < 1){
+        errors.noanswer = 'Answer not found';
+        return res.status(404).json(errors);
+      }
+
+      question.best_answer = answerId;
+      question.save().then(question => res.json(question));
+    })
+
+  })
 })
 
 // @route   POST api/question/report/:id
