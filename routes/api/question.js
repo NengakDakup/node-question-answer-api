@@ -208,7 +208,8 @@ router.post('/approve', passport.authenticate('jwt', {session: false}), (req, re
       }
 
       question.best_answer = answerId;
-      question.save().then(question => res.json(question));
+      question.save()
+      .then(question => res.json(question));
     })
 
   })

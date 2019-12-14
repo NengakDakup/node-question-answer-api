@@ -12,7 +12,7 @@ const profile = require('./routes/api/profile');
 const question = require('./routes/api/question');
 const answer = require('./routes/api/answer');
 const search = require('./routes/api/search');
-const upload = require('./routes/api/upload');
+// const upload = require('./routes/api/upload');
 
 const app = express();
 
@@ -43,7 +43,7 @@ app.use('/api/profile', profile);
 app.use('/api/question', question);
 app.use('/api/answer', answer);
 app.use('/api/search', search);
-app.use('/api/upload', upload);
+// app.use('/api/upload', upload);
 app.use(express.static('public'));
 
 const port = process.env.PORT || 5000;
