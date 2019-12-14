@@ -4,9 +4,7 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const escape_html = require('escape-html');
 const axios = require('axios');
-var multer  = require('multer')
 const slugify = require('slugify');
-var upload = multer({ dest: '../../uploads/' })
 
 
 // Load Input Validation
