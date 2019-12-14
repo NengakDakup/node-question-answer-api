@@ -76,7 +76,7 @@ router.get('/', (req, res) => {
 // @route   POST api/question/create
 // @desc    Create or Edit user question
 // @access  private
-router.post('/create', upload.single('image'), passport.authenticate('jwt', { session: false }), (req, res) => {
+router.post('/create', passport.authenticate('jwt', { session: false }), (req, res) => {
   // Validate the inputs
   const {errors, isValid} = validateQuestionInput(req.body);
   // Check Validation Errors
