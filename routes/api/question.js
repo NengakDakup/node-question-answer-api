@@ -6,6 +6,9 @@ const escape_html = require('escape-html');
 const axios = require('axios');
 const slugify = require('slugify');
 
+const notify = require('../../functions/Notify');
+let notifyFor = {};
+
 
 // Load Input Validation
 const validateQuestionInput = require('../../validation/question')
@@ -47,7 +50,12 @@ router.get('/:id', (req, res) => {
 router.get('/slug/:slug', (req, res) => {
   const errors = {};
   Question.findOne({slug: req.params.slug})
-    .populate('user answer')
+    .populate({
+      path: 'user answers.answer answers.answer',
+      populate: {
+        path: 'user comments.user'
+      }
+    })
     .then(question => {
       if(!question) return res.status(400).json({noquestion: 'Question Not found'});
       return res.json(question);
@@ -61,7 +69,35 @@ router.get('/slug/:slug', (req, res) => {
 router.get('/', (req, res) => {
   const errors = {};
   Question.find()
-    .populate('user', ['name', 'avatar'])
+    .populate({
+      path: 'user answers.answer answers.answer',
+      populate: {
+        path: 'user comments.user'
+      }
+    })
+    .then(questions => {
+      if(!questions) {
+        errors.noquestions = 'There are no questions';
+        return res.status(404).json(errors);
+      }
+
+      return res.json(questions.reverse());
+    })
+    .catch(err => res.status(404).json({noquestions: 'There are no questions'}));
+});
+
+// @route   GET api/question/for/:id
+// @desc    Gets all questions for a user
+// @access  public
+router.get('/for/:id', (req, res) => {
+  const errors = {};
+  Question.find({user: req.params.id})
+    .populate({
+      path: 'user answers.answer',
+      populate: {
+        path: 'user'
+      }
+    })
     .then(questions => {
       if(!questions) {
         errors.noquestions = 'There are no questions';
@@ -100,27 +136,28 @@ router.post('/create', passport.authenticate('jwt', { session: false }), (req, r
   Profile.findOne({user: req.user.id}).then(profile => {
     // Check if question-slug exists
     Question.findOne({slug: questionFields.slug})
-    .populate('user')
+    .populate({
+      path: 'user answers.answer',
+      populate: {
+        path: 'user'
+      }
+    })
     .then(question => {
       if (question){
-        // Check if question was created by the user
-        if (question.user._id.toString() === req.user.id.toString()) {
-          // Update the question
-          Question.findOneAndUpdate(
-            { user: req.user.id},
-            { $set: questionFields },
-            { new: true}
-          ).populate('user', ['name', 'avatar']).then(question => res.json(question)).catch(err => console.log(err))
-        } else {
-          errors.alreadyexists = 'Question already exists';
-          return res.status(400).json(errors);
-        }
+        res.status(400).json({alreadyexists: 'Question Already Exists'});
 
       } else {
         // Save the question
-        new Question(questionFields).save()
+        new Question(questionFields)
+        .save()
           .then(question => {
-            res.json(question)
+            Question.findById(question._id)
+              .populate({
+                path: 'user answers.answer',
+                populate: {
+                  path: 'user'
+                }
+              }).then(question => res.json(question))
           })
           .catch(err => console.log(err));
 
@@ -159,6 +196,7 @@ router.post('/like/:id', passport.authenticate('jwt', { session: false}), (req, 
     Question.findById(req.params.id).then(question => {
       // check if question exists
       if(!question) res.json({noquestion: 'Question not found'})
+      notifyFor.user = question.user;
       // check if post is liked or not, then act accordingly
       if (question.likes.filter(like => like.user.toString() === req.user.id).length > 0) {
         // Get the remove index
@@ -166,11 +204,30 @@ router.post('/like/:id', passport.authenticate('jwt', { session: false}), (req, 
         // Splice it out of the array
         question.likes.splice(removeIndex, 1);
         // Save the post
-        question.save().then(question => res.json(question));
+        question.save().then(question => {
+          Question.findById(question._id)
+            .populate({
+              path: 'user answers.answer',
+              populate: {
+                path: 'user'
+              }
+            }).then(question => res.json(question))
+        });
       } else {
         //Add user likes to the array
         question.likes.unshift({user: req.user.id});
-        question.save().then(post => res.json(post));
+        question.save().then(question => {
+          Question.findById(question._id)
+            .populate({
+              path: 'user answers.answer',
+              populate: {
+                path: 'user'
+              }
+            }).then(question => {
+                notify(req.user.id, req.user.name, 'Liked', 'Question', question.slug, notifyFor.user);
+                res.json(question)
+            })
+        });
       }
     }).catch(err => res.json({noquestion: 'Question not found'}));
   }).catch(err => res.json({nouser: 'User not found'}));
@@ -188,7 +245,12 @@ router.post('/approve', passport.authenticate('jwt', {session: false}), (req, re
     }
     const {questionId, answerId} = req.body;
     Question.findById(questionId)
-    .populate('user')
+    .populate({
+      path: 'user answers.answer',
+      populate: {
+        path: 'user'
+      }
+    })
     .then(question => {
       if(!question){
         errors.noquestion = 'Question not Found';
@@ -200,14 +262,21 @@ router.post('/approve', passport.authenticate('jwt', {session: false}), (req, re
         return res.status(404).json(errors);
       }
 
-      if(question.answers.filter(answer => answer.answer.toString() === answerId).length < 1){
+      if(question.answers.filter(answer => answer.answer._id.toString() === answerId).length < 1){
         errors.noanswer = 'Answer not found';
         return res.status(404).json(errors);
       }
 
       question.best_answer = answerId;
+      const ques = question;
       question.save()
-      .then(question => res.json(question));
+      .then(question => {
+        Answer.findById(req.body.answerId)
+          .then(answer => {
+            notify(req.user.id, req.user.name, 'Approved', 'Answer', question.slug, answer.user);
+            res.json(ques);
+          })
+      });
     })
 
   })

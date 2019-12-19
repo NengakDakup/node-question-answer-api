@@ -6,6 +6,8 @@ const passport = require('passport');
 // Load Input Validation
 const validateAnswerInput = require('../../validation/answer');
 const validateCommentInput = require('../../validation/comment');
+const notify = require('../../functions/Notify');
+let notifyFor = {};
 
 // Load Question Model
 const Question = require('../../models/Question');
@@ -44,13 +46,25 @@ router.post('/create', passport.authenticate('jwt', { session: false }), (req, r
     // Check if question-slug exists
     Question.findOne({_id: answerFields.question}).then(question => {
       if (question){
+        notifyFor.user = question.user;
         // Check if question was created by the user
         // Save the question
         new Answer(answerFields).save()
           .then(answer => {
             //Add answer to the questions array
             question.answers.unshift({answer: answer._id});
-            question.save().then(question => res.json(question));
+            question.save().then(question => {
+              Question.findOne({slug: question.slug})
+                .populate({
+                  path: 'user answers.answer answers.answer',
+                  populate: {
+                    path: 'user comments.user'
+                  }
+                }).then(question => {
+                  notify(req.user.id, req.user.name, 'Answered', 'Question', question.slug, notifyFor.user);
+                  res.json(question);
+                })
+            })
           })
           .catch(err => console.log(err));
 
@@ -69,8 +83,33 @@ router.post('/create', passport.authenticate('jwt', { session: false }), (req, r
 // @route   GET api/answer/delete/:id
 // @desc    Delete an answer
 // @access  private
-router.get('/delete/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
-  res.status(200).json('working');
+router.delete('/delete/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
+  // first check if user profile exists
+  Profile.findOne({user: req.user.id}).then(profile => {
+    // wtf i need to check if the question was posted by the user
+    Answer.findOne({_id: req.params.id})
+      .then(answer => {
+        // Check if question was posted by user
+        if ( answer.user._id.toString() === req.user.id.toString() ) {
+          Answer.deleteOne({_id: req.params.id}).then(msg => {
+            Question.findOne({_id: answer.question.toString()})
+              .then(question => {
+                  // Get the remove index
+                  const removeIndex = question.answers.map(item => item.answer.toString()).indexOf(req.params.id);
+                  // Splice it out of the array
+                  question.answers.splice(removeIndex, 1);
+                  if(question.best_answer && question.best_answer.toString() === req.params.id) question.best_answer = null;
+                  // Save the post
+                  question.save().then(question => res.json(msg));
+                  // finally
+              })
+
+          });
+        } else {
+          return res.status(400).json({unauthorized: 'Unauthorized'});
+        }
+      })
+  })
 })
 
 // @route   GET api/answer/for/:id
@@ -98,11 +137,13 @@ router.get('/for/:id', (req, res) => {
 // @access  private
 router.get('/upvote/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
   const errors = {};
+
   //check if user profile exists
   Profile.findOne({user: req.user.id}).then(profile => {
     Answer.findOne({_id: req.params.id}).then(answer => {
       if(!answer) res.json({noanswer: 'Answer not found'});
         //check if question is already upvoted
+        notifyFor.user = answer.user;
         if(answer.upvotes.filter(upvote => upvote.user.toString() === req.user.id).length > 0){
           //upvoted already:
           return res.status(400).json({alreadyupvoted: 'Answer already upvoted'});
@@ -117,12 +158,34 @@ router.get('/upvote/:id', passport.authenticate('jwt', { session: false }), (req
             // Add the user to the upvotes array
             answer.upvotes.unshift({user: req.user.id});
             // save the downvotes
-            answer.save().then(answer => res.json(answer));
+            answer.save().then(answer => {
+              Question.findById(answer.question)
+                .populate({
+                  path: 'user answers.answer answers.answer',
+                  populate: {
+                    path: 'user comments.user'
+                  }
+                }).then(question => {
+                  notify(req.user.id, req.user.name, 'Upvoted', 'Answer', question.slug, notifyFor.user);
+                  res.json(question);
+                })
+            })
           } else {
             // Add the user to the upvotes array
             answer.upvotes.unshift({user: req.user.id});
             // save the downvotes
-            answer.save().then(answer => res.json(answer));
+            answer.save().then(answer => {
+              Question.findById(answer.question)
+                .populate({
+                  path: 'user answers.answer answers.answer',
+                  populate: {
+                    path: 'user comments.user'
+                  }
+                }).then(question => {
+                  notify(req.user.id, req.user.name, 'Upvoted', 'Answer', question.slug, notifyFor.user);
+                  res.json(question);
+                })
+            })
           }
         }
     }).catch(err => res.status(404).json({noanswer: 'Answer does not exist'}))
@@ -139,6 +202,7 @@ router.get('/downvote/:id', passport.authenticate('jwt', { session: false }), (r
   Profile.findOne({user: req.user.id}).then(profile => {
     Answer.findOne({_id: req.params.id}).then(answer => {
       if(!answer) res.json({noanswer: 'Answer not found'});
+        notifyFor.user = answer.user;
         //check if question is already downvoted
         if(answer.downvotes.filter(downvote => downvote.user.toString() === req.user.id).length > 0){
           //downvoted already:
@@ -154,12 +218,34 @@ router.get('/downvote/:id', passport.authenticate('jwt', { session: false }), (r
             // Add the user to the downvotes array
             answer.downvotes.unshift({user: req.user.id});
             // save the answer
-            answer.save().then(answer => res.json(answer));
+            answer.save().then(answer => {
+              Question.findById(answer.question)
+                .populate({
+                  path: 'user answers.answer answers.answer',
+                  populate: {
+                    path: 'user comments.user'
+                  }
+                }).then(question => {
+                  notify(req.user.id, req.user.name, 'Downvoted', 'Answer', question.slug, notifyFor.user);
+                  res.json(question);
+                })
+            })
           } else {
             // Add the user to the downvotes array
             answer.downvotes.unshift({user: req.user.id});
             // save the answer
-            answer.save().then(answer => res.json(answer));
+            answer.save().then(answer => {
+              Question.findById(answer.question)
+                .populate({
+                  path: 'user answers.answer',
+                  populate: {
+                    path: 'user'
+                  }
+                }).then(question => {
+                  notify(req.user.id, req.user.name, 'Downvoted', 'Answer', question.slug, notifyFor.user);
+                  res.json(question);
+                })
+            });
           }
         }
     }).catch(err => res.status(404).json({noanswer: 'Answer does not exist'}))
@@ -188,12 +274,27 @@ router.post('/comment/add', passport.authenticate('jwt', { session: false }), (r
     .then(profile => {
       if(!profile) return res.json({noprofile: 'User not found'});
       Answer.findOne({_id: req.body.answer_id})
+        .populate({
+          path: 'comments.user'
+        })
         .then(answer => {
           if(!answer) return res.json({noanswer: 'Answer not found'});
+          notifyFor.user = answer.user;
           //save the comment
-          answer.comments.unshift(commentFields);
+          answer.comments.push(commentFields);
           // save the answer
-          answer.save().then(answer => res.json(answer));
+          answer.save().then(answer => {
+            Question.findById(answer.question)
+              .populate({
+                path: 'user answers.answer answers.answer',
+                populate: {
+                  path: 'user comments.user'
+                }
+              }).then(question => {
+                notify(req.user.id, req.user.name, 'Commented', 'Answer', question.slug, notifyFor.user);
+                res.json(question);
+              })
+          });
         }).catch(err => res.json({noanswer: 'Answer not found'}))
     }).catch(err => res.json({nouser: 'User not found'}))
 })
@@ -208,6 +309,9 @@ router.post('/comment/delete', passport.authenticate('jwt', { session: false }),
     .then(profile => {
       if(!profile) return res.json({noprofile: 'User not found'});
       Answer.findOne({_id: req.body.answer_id})
+        .populate({
+          path: 'comments.user'
+        })
         .then(answer => {
           if(!answer) return res.json({noanswer: 'Answer not found'});
           //check if comment exists
@@ -217,10 +321,52 @@ router.post('/comment/delete', passport.authenticate('jwt', { session: false }),
           // Splice it out of the array
           answer.comments.splice(removeIndex, 1);
           // save the answer
-          answer.save().then(answer => res.json(answer))
+          answer.save().then(answer => {
+            Question.findById(answer.question)
+              .populate({
+                path: 'user answers.answer answers.answer',
+                populate: {
+                  path: 'user comments.user'
+                }
+              }).then(question => {
+                //notify(req.user.id, req.user.name, 'Upvoted', 'Answer', question.slug, notifyFor.user);
+                res.json(question);
+              })
+          })
         }).catch(err => res.json({noanswer: 'Answer not found'}))
     }).catch(err => res.json({nouser: 'User not found'}))
 })
+
+// @route   POST api/answer/report/:id
+// @desc    Report a question
+// @access  private
+router.post('/report/:id', passport.authenticate('jwt', { session: false}), (req, res) => {
+  User.findById(req.user.id).then(user => {
+    const errors = {};
+    if(!user) {
+      errors.nouser = 'User not Found';
+      return res.status(404).json(errors);
+    }
+    // check if question exists
+    Answer.findById(req.params.id).then(question => {
+      if(!question) {
+        errors.noquestion = 'Answer not found';
+        return res.status(404).json(errors);
+      }
+
+      // set the report fileds
+      const reportFields = {};
+      reportFields.type = 'answer';
+      reportFields.id = req.params.id;
+      reportFields.user = req.user.id;
+
+      // Save the report
+      new Reported(reportFields).save().then(reported => res.json(reported));
+
+    }).catch(err => res.json(err))
+  })
+})
+
 
 
 module.exports = router;

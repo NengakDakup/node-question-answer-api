@@ -9,11 +9,23 @@ const UserSchema = new Schema({
     },
     email: {
         type: String,
-        required: true
     },
     password: {
         type: String,
-        required: true
+    },
+    resetPin: {
+      pin: {
+          type: String,
+          default: null
+      },
+      expiresat: {
+        type: Date,
+        default: null
+      },
+      stage: {
+        type: Number,
+        default: 1
+      },
     },
     avatar: {
         type: String
@@ -22,9 +34,15 @@ const UserSchema = new Schema({
         type: Number,
         default: 1
     },
+    facebookId: {
+      type: String
+    },
+    googleId: {
+      type: String
+    },
     date: {
         type: Date,
-        required: true
+        default: Date.now()
     }
 
 })

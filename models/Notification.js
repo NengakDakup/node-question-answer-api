@@ -4,57 +4,32 @@ const Schema = mongoose.Schema;
 // Create Schema
 const NotificationSchema = new Schema({
     user: {
-        type: Schema.Types.ObjectId,
-        ref: 'users'
-    },
-    question: {
       type: Schema.Types.ObjectId,
       ref: 'users'
     },
-    body: {
-        type: Object,
-        required: true
+    triggeredBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'users'
     },
-    upvotes: [
-      {
-        user: {
-          type: Schema.Types.ObjectId,
-          ref: 'users'
-        }
-      }
-    ],
-    downvotes: [
-      {
-        user: {
-          type: Schema.Types.ObjectId,
-          ref: 'users'
-        }
-      }
-    ],
-    comments: [
-      {
-        user: {
-          type: Schema.Types.ObjectId,
-          ref: 'users'
-        },
-        body: {
-          type: String,
-          required: true
-        },
-        avatar: {
-          type: String,
-          required: true
-        },
-        date: {
-          type: Date,
-          default: Date.now
-        }
-
-      }
-    ],
-    status: {
+    reaction: {
+      type: String
+    },
+    title: {
+      type: String
+    },
+    type: {
+      type: String
+    },
+    link: {
+      type: String
+    },
+    read: {
       type: Boolean,
-      default: true
+      default: false
+    },
+    seen: {
+      type: Boolean,
+      default: false
     },
     date: {
       type: Date,

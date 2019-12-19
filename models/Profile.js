@@ -23,6 +23,10 @@ const ProfileSchema = new Schema({
     country: {
         type: String
     },
+    points: {
+      type: Number,
+      default: 0
+    },
     followers: [
       {
         user: {

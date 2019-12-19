@@ -5,6 +5,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const keys = require('../../config/keys');
+const dotenv = require('dotenv');
+dotenv.config();
 
 // Load Input Validation
 const validateRegisterInput = require('../../validation/register')
@@ -116,6 +118,82 @@ router.post('/login', (req, res) => {
         })
 })
 
+// @route   POST api/auth/send-reset
+// @desc    Send User reset Password
+// @access  public
+router.post('/send-reset', (req, res) => {
+  User.findOne({email: req.body.email})
+    .then(user => {
+      if(!user) res.status(404).json({nouser: 'Account not Found'});
+      // generate a 4 digit pin
+      let pin = Math.random().toString(36).substr(2, 4);
+      user.resetPin.pin = pin;
+      user.resetPin.expiresat = (new Date()).getTime();
+      user.resetPin.stage = 2;
+      // save to the db
+      user.save().then(user => {
+        // send the mail
+        res.json({success: `An verification pin has been sent to ${req.body.email}, please check your email address`});
+      })
+    })
+})
+
+// @route   POST api/auth/confirm-reset
+// @desc    Confirm Reset User Password
+// @access  public
+router.post('/confirm-reset', (req, res) => {
+  const { email, pin } = req.body;
+  User.findOne({email: email})
+    .then(user => {
+      if(!user) return res.status(404).json({nouser: 'Account not Found'});
+      console.log(user.resetPin.pin);
+      if(user.resetPin.pin !== pin) return res.status(400).json({pin: 'Incorrect Pin'})
+      if(user.resetPin.stage !== 2) return res.status(400).json({pin: 'Unknown Error'})
+      // compare the time and see if it's greater than 15minutes
+      const then = user.resetPin.expiresat;
+      const now = (new Date()).getTime();
+      // function to get the difference in minutes
+      function diff_minutes(dt2, dt1){
+        var diff =(dt2 - dt1) / 1000;
+        diff /= 60;
+        return Math.abs(Math.round(diff));
+      }
+
+      let difference = diff_minutes(then, now);
+      if(difference > 15) res.status(400).json({pin: 'Pin Already Expired'});
+      user.resetPin.stage = 3;
+      user.save().then(user => {
+        res.json({confirmed: 'confirmed'});
+      })
+    })
+})
+
+// @route   POST api/auth/make-reset
+// @desc    Reset User Password
+// @access  public
+router.post('/make-reset', (req, res) => {
+  const { email, pin, newPassword } = req.body;
+  User.findOne({email: email})
+    .then(user => {
+      if(!user) return res.status(404).json({pin: 'Account not Found'});
+      if(user.resetPin.stage !== 3) res.status(400).json({pin: 'Unknown Error'})
+      if(user.resetPin.pin !== pin) res.status(400).json({pin: 'Unknown Error'});
+      // encrypt the password
+      bcrypt.genSalt(10, (err, salt) => {
+          bcrypt.hash(newPassword, salt, (err, hash) => {
+              if(err) throw err;
+              user.password = hash;
+              user.resetPin.stage = 0;
+              user.resetPin.pin = null;
+              user.resetPin.expiresat = null;
+              user.save()
+                  .then(user => res.json(user))
+                  .catch(err => console.log(err));
+          });
+      });
+    })
+})
+
 // @route   POST api/auth/current
 // @desc    Return Current User
 // @access  private
@@ -127,5 +205,31 @@ router.get('/current', passport.authenticate('jwt', { session: false}), (req, re
         avatar: req.user.avatar
     });
 });
+
+router.get('/facebook', passport.authenticate('facebook', {
+  scope: [ 'email', 'public_profile', 'user_photos'],
+  profileFields: ['id', 'displayName', 'photos'],
+}));
+
+router.get('/facebook/callback',
+  passport.authenticate('facebook', { failureRedirect: `${process.env.frontendURL}/login` }),
+  function(req, res) {
+    // Successful authentication, redirect home.
+    // redirect to frontend
+    res.redirect(`${process.env.frontendURL}/settoken/${req.user.token}`);
+  });
+
+router.get('/google',
+  passport.authenticate('google', { scope:
+      [ 'https://www.googleapis.com/auth/plus.login',
+      , 'https://www.googleapis.com/auth/plus.profile.emails.read' ] }
+));
+
+router.get( '/google/callback',
+    passport.authenticate( 'google', {
+        successRedirect: '/auth/google/success',
+        failureRedirect: '/auth/google/failure'
+}));
+
 
 module.exports = router;

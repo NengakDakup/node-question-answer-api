@@ -10,6 +10,13 @@ const validateProfileInput = require('../../validation/profile')
 const Profile = require('../../models/Profile');
 // Load User Model
 const User = require('../../models/User');
+// load Question Model
+const Question = require('../../models/Question');
+// load Answer Model
+const Answer = require('../../models/Answer');
+
+const notify = require('../../functions/Notify');
+let notifyFor = {};
 
 // @route   GET api/profile/test
 // @desc    Tests profile route
@@ -84,7 +91,25 @@ router.get('/user/:id', (req, res) => {
         errors.noprofile = 'User not Found';
         return res.status(404).json(errors);
       }
-      if(profile) return res.json(profile);
+      if(profile){
+        let newProfile = {};
+        newProfile.questions = 0;
+        newProfile.answers = 0;
+        newProfile.profile = profile;
+        // Load the users questions
+        Question.find({user: id}).then(questions => {
+          if(questions.length >= 1){
+            newProfile.questions = questions.length;
+          }
+            // Load the users answers
+          Answer.find({user: id}).then(answers => {
+            if(answers.length >= 1){
+              newProfile.answers = answers.length;
+            }
+            res.json(newProfile);
+          })
+        })
+      }
     })
     .catch(err => {
       errors.noprofile = 'User not Found';
@@ -154,6 +179,7 @@ router.get('/follow/:id', passport.authenticate('jwt', { session: false }), (req
     Profile.findOne({user: req.params.id}).then(profile => {
       // check if question exists
       if(!profile) res.json({noprofile: 'Profile not found'})
+      notifyFor.user = profile.user;
       // check if post is liked or not, then act accordingly
       if (profile.followers.filter(follower => follower.user.toString() === req.user.id).length > 0) {
         // Get the remove index
@@ -165,7 +191,10 @@ router.get('/follow/:id', passport.authenticate('jwt', { session: false }), (req
       } else {
         //Add user likes to the array
         profile.followers.unshift({user: req.user.id});
-        profile.save().then(followers => res.json(followers));
+        profile.save().then(followers => {
+          notify(req.user.id, req.user.name, 'Followed', 'Follow', req.user.id, notifyFor.user);
+          res.json(followers);
+        });
       }
     }).catch(err => res.json({noprofile: 'Profile not found'}));
   }).catch(err => res.json({noprofile: 'Profile not found'}));
