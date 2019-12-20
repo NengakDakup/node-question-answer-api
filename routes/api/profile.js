@@ -46,7 +46,7 @@ router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => 
 router.get('/all', (req, res) => {
   const errors = {};
   Profile.find()
-    .populate('user', ['name', 'avatar'])
+    .populate('user', ['name', 'avatar', 'email'])
     .then(profiles => {
       if(!profiles) {
         errors.noprofiles = 'There are no profiles';

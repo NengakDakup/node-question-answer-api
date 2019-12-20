@@ -63,6 +63,25 @@ router.get('/slug/:slug', (req, res) => {
     .catch(err => res.status(404).json({noquestion: 'Question not found'}));
 })
 
+// @route   GET api/question/slug/:slug
+// @desc    Gets a particular question by slug
+// @access  public
+router.get('/category/:category', (req, res) => {
+  const errors = {};
+  Question.find({category: req.params.category})
+    .populate({
+      path: 'user answers.answer answers.answer',
+      populate: {
+        path: 'user comments.user'
+      }
+    })
+    .then(questions => {
+      if(!questions.length >= 1) return res.status(400).json({noquestion: 'Question Not found'});
+      return res.json(questions.reverse());
+    })
+    .catch(err => res.status(404).json({noquestion: 'Question not found'}));
+})
+
 // @route   GET api/question
 // @desc    Gets all questions
 // @access  public
@@ -126,7 +145,7 @@ router.post('/create', passport.authenticate('jwt', { session: false }), (req, r
   const questionFields = {};
   questionFields.user = req.user.id;
   if(req.body.question_title) questionFields.question_title = req.body.question_title;
-  if(req.body.question_title) questionFields.slug = slugify(req.body.question_title.toLowerCase(), {remove: /[*+~.,()'"!?:@]/g});
+  if(req.body.question_title) questionFields.slug = slugify(req.body.question_title.toLowerCase(), {remove: /[*+~.,()'\/\\"!?:@]/g});
   if(req.body.category) questionFields.category = req.body.category;
   if(req.body.tags) questionFields.tags = req.body.tags;
   if(req.body.body) questionFields.body = req.body.body;
@@ -302,6 +321,7 @@ router.post('/report/:id', passport.authenticate('jwt', { session: false}), (req
       // set the report fileds
       const reportFields = {};
       reportFields.type = 'question';
+      reportFields.question = question.slug;
       reportFields.id = req.params.id;
       reportFields.user = req.user.id;
 
@@ -310,6 +330,24 @@ router.post('/report/:id', passport.authenticate('jwt', { session: false}), (req
 
     }).catch(err => res.json(err))
   })
+})
+
+// @route   GET api/question/reported
+// @desc    Get All the user profiles
+// @access  public
+router.get('/reported/all', (req, res) => {
+  const errors = {};
+  Reported.find()
+    .populate('user', ['name', 'avatar', 'email'])
+    .then(profiles => {
+      if(!profiles) {
+        errors.noprofiles = 'There are no profiles';
+        return res.status(404).json(errors);
+      }
+
+      res.json(profiles.reverse());
+    })
+    .catch(err => res.status(404).json({profile: 'There are no profiles'}));
 })
 
 

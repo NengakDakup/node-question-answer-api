@@ -7,6 +7,9 @@ const ReportedSchema = new Schema({
         type: String,
         required: true
     },
+    question: {
+      type: String
+    },
     id: {
         type: String,
         required: true

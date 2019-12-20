@@ -6,7 +6,7 @@ const Notification = require('../models/Notification');
 const Pointer = require('./Pointer');
 
 const notify = (triggeredById, triggeredByName, reaction, type, slug, triggeredFor) => {
-  if(triggeredById.toString() === triggeredFor.toString() && reaction !== 'Approved') return console.log('uihiuhj');
+  if(triggeredById.toString() === triggeredFor.toString() && reaction !== 'Approved') return null;
   let notifyFields = {};
   notifyFields.user = triggeredFor;
   notifyFields.triggeredBy = triggeredById;
@@ -19,7 +19,7 @@ const notify = (triggeredById, triggeredByName, reaction, type, slug, triggeredF
 
   new Notification(notifyFields).save()
     .then(notification => {
-      Pointer();
+      Pointer(triggeredFor, reaction);
       return notification;
     })
   // Notification.findOne({title: notifyFields.title})

@@ -13,9 +13,10 @@ const question = require('./routes/api/question');
 const answer = require('./routes/api/answer');
 const search = require('./routes/api/search');
 const notification = require('./routes/api/notification');
+const admin = require('./routes/api/admin');
 // const upload = require('./routes/api/upload');
 
-const notify = require('./functions/Notify');
+// const notify = require('./functions/Notify');
 //      triggeredBy, reaction,  type,          link,             triggeredFor
 // notify('John Dee', 'Liked', 'Question', 'link/to/notification', 'Dakup Nengak');
 
@@ -48,10 +49,11 @@ app.use('/api/question', question);
 app.use('/api/answer', answer);
 app.use('/api/search', search);
 app.use('/api/notification', notification);
+app.use('/api/admin', admin);
 // app.use('/api/upload', upload);
 app.use(express.static('public'));
 
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 4000;
 
 app.listen(port, () => {
     console.log(`App has Started on port ${port}`);

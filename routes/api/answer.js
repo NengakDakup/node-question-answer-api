@@ -358,6 +358,7 @@ router.post('/report/:id', passport.authenticate('jwt', { session: false}), (req
       const reportFields = {};
       reportFields.type = 'answer';
       reportFields.id = req.params.id;
+      reportFields.question = question.question;
       reportFields.user = req.user.id;
 
       // Save the report
