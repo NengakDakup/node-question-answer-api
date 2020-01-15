@@ -6,11 +6,13 @@ const ExtractJwt = require('passport-jwt').ExtractJwt;
 const mongoose = require('mongoose');
 const User = mongoose.model('users');
 const Profile = mongoose.model('profiles');
-const keys = require('../config/keys');
+
+const dotenv = require('dotenv');
+dotenv.config();
 
 const opts = {};
 opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-opts.secretOrKey = keys.JWTKey;
+opts.secretOrKey = process.env.JWTKey;
 
 module.exports = passport => {
     passport.serializeUser( (user, cb) => {
@@ -38,8 +40,8 @@ module.exports = passport => {
 
      // PASSPORT FacebookStrategy
     passport.use(new FacebookStrategy({
-      clientID: keys.facebook.clientID,
-      clientSecret: keys.facebook.clientSecret,
+      clientID: process.env.facebookClientId,
+      clientSecret: process.env.facebookClientSecret,
       callbackURL: '/auth/facebook/callback'
     },
     (accessToken, refreshToken, profile, cb) => {
@@ -48,7 +50,7 @@ module.exports = passport => {
           const payload = { id: user.id, name: user.name, avatar: user.avatar };
           // Sign the Token
           // expires in one week
-          jwt.sign(payload, keys.JWTKey, {expiresIn: 604800}, (err, token) => {
+          jwt.sign(payload, process.env.JWTKey, {expiresIn: 604800}, (err, token) => {
               user.token = 'Bearer ' + token
               return cb(err, user);
           });
@@ -66,7 +68,7 @@ module.exports = passport => {
                 const payload = { id: user.id, name: user.name, avatar: user.avatar };
                 // Sign the Token
                 // expires in one week
-                jwt.sign(payload, keys.JWTKey, {expiresIn: 604800}, (err, token) => {
+                jwt.sign(payload, process.env.JWTKey, {expiresIn: 604800}, (err, token) => {
                     user.token = 'Bearer ' + token
                     return cb(err, user);
                 });
@@ -90,7 +92,7 @@ module.exports = passport => {
           const payload = { id: user.id, name: user.name, avatar: user.avatar };
           // Sign the Token
           // expires in one week
-          jwt.sign(payload, keys.JWTKey, {expiresIn: 604800}, (err, token) => {
+          jwt.sign(payload, process.env.JWTKey, {expiresIn: 604800}, (err, token) => {
               user.token = 'Bearer ' + token
               return done(err, user);
           });
@@ -109,7 +111,7 @@ module.exports = passport => {
                 const payload = { id: user.id, name: user.name, avatar: user.avatar };
                 // Sign the Token
                 // expires in one week
-                jwt.sign(payload, keys.JWTKey, {expiresIn: 604800}, (err, token) => {
+                jwt.sign(payload, process.env.JWTKey, {expiresIn: 604800}, (err, token) => {
                     user.token = 'Bearer ' + token
                     return done(err, user);
                 });

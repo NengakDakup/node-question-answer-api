@@ -4,7 +4,6 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
-const keys = require('../../config/keys');
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -103,7 +102,7 @@ router.post('/login', (req, res) => {
                         const payload = { id: user.id, name: user.name, avatar: user.avatar, status: user.status };
                         // Sign the Token
                         // expires in one week
-                        jwt.sign(payload, keys.JWTKey, {expiresIn: 604800}, (err, token) => {
+                        jwt.sign(payload, process.env.JWTKey, {expiresIn: 604800}, (err, token) => {
                             res.json({
                                 reply: 'Success',
                                 token: 'Bearer ' + token
