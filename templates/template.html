@@ -102,7 +102,7 @@ img.g-img + div {
     <!-- Progressive Enhancements : BEGIN -->
     <style>
 	    .primary{
-	background: #448ef6;
+	background: #2f89fc;
 }
 .bg_white{
 	background: #ffffff;
@@ -117,7 +117,7 @@ img.g-img + div {
 	background: rgba(0,0,0,.8);
 }
 .email-section{
-	padding:1em;
+	padding:2.5em;
 }
 /*BUTTON*/
 .btn{
@@ -125,17 +125,17 @@ img.g-img + div {
 	display: inline-block;
 }
 .btn.btn-primary{
-	border-radius: 30px;
-	background: #448ef6;
+	border-radius: 5px;
+	background: #2f89fc;
 	color: #ffffff;
 }
 .btn.btn-white{
-	border-radius: 30px;
+	border-radius: 5px;
 	background: #ffffff;
 	color: #000000;
 }
 .btn.btn-white-outline{
-	border-radius: 30px;
+	border-radius: 5px;
 	background: transparent;
 	border: 1px solid #fff;
 	color: #fff;
@@ -154,7 +154,7 @@ body{
 	color: rgba(0,0,0,.4);
 }
 a{
-	color: #448ef6;
+	color: #2f89fc;
 }
 table{
 }
@@ -187,31 +187,18 @@ table{
 	position: relative;
 	z-index: 0;
 }
-.hero .overlay{
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	content: '';
-	width: 100%;
-	background: #000000;
-	z-index: -1;
-	opacity: .3;
-}
 .hero .text{
-	color: rgba(255,255,255,.9);
+	color: rgba(0,0,0,.3);
 }
 .hero .text h2{
-	color: #fff;
+	color: #000;
 	font-size: 30px;
 	margin-bottom: 0;
 	font-weight: 300;
-	line-height: 1;
 }
 .hero .text h2 span{
 	font-weight: 600;
-	color: #448ef6;
+	color: #2f89fc;
 }
 /*HEADING SECTION*/
 .heading-section{
@@ -240,7 +227,7 @@ table{
 	content: '';
 	width: 100%;
 	height: 2px;
-	background: #448ef6;
+	background: #2f89fc;
 	margin: 0 auto;
 }
 .heading-section-white{
@@ -262,11 +249,15 @@ table{
 	letter-spacing: 2px;
 	color: rgba(255,255,255,.4);
 }
-/*BLOG*/
-.text-services .meta{
-	text-transform: uppercase;
-	font-size: 14px;
+/*PROJECT*/
+.text-project{
+	padding-top: 10px;
+}
+.text-project h3{
 	margin-bottom: 0;
+}
+.text-project h3 a{
+	color: #000;
 }
 /*FOOTER*/
 .footer{
@@ -307,28 +298,19 @@ table{
           	<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
           		<tr>
           			<td class="logo" style="text-align: center;">
-			            <h1><a href="#">Solution Wheels</a></h1>
-			            <!-- <ul class="navigation">
-			            	<li><a href="#">Home</a></li>
-			            	<li><a href="#">About</a></li>
-			            	<li><a href="#">Blog</a></li>
-			            	<li><a href="#">Contact</a></li>
-			            </ul> -->
+			            <h1><a href="#">Agency</a></h1>
 			          </td>
           		</tr>
           	</table>
           </td>
 	      </tr><!-- end tr -->
-	      <tr>
-          <td valign="middle" class="hero bg_white" style="background-image: url(images/bg_1.jpg); background-size: cover; height: 400px; background-color: #448ef6;">
-          	<div class="overlay"></div>
+				<tr>
+          <td valign="middle" class="hero hero-2 bg_white" style="padding: 4em 0;">
             <table>
             	<tr>
             		<td>
-            			<div class="text" style="padding: 0 1em; text-align: center;">
-            				<h2>Welcome to Solution Wheels!</h2>
-            				<p>Solutionwheels gives users the opportunity to ask questions which can be answered by all other users therefore opportunity to get robust answers with different analysis which gives the person who asked the question the opportunity to choose from wide a range of answers.</p>
-            				<p><a href="#" class="btn btn-primary">Ask a Question?</a></p>
+            			<div class="text" style="padding: 0 3em; text-align: center;">
+            				<h2>We Are Portfolio Agency, We Create <span>Functional</span> &amp; <span>Beautiful</span> Website</h2>
             			</div>
             		</td>
             	</tr>
@@ -336,123 +318,108 @@ table{
           </td>
 	      </tr><!-- end tr -->
 	      <tr>
-	        <td class="bg_white email-section">
-	        	<div class="heading-section" style="text-align: center; padding: 0 30px;">
-	          	<h2>Top Questions</h2>
-	          	<p>Here are some of the top rated and most interactive questions from the site!.</p>
-	        	</div>
-	        	<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
-	        		<tr>
-	              <td valign="top" width="50%" style="padding-top: 20px; padding-right: 10px;">
-	                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-	                  <tr>
-	                    <td>
-	                      <img src="images/work-1.jpg" alt="" style="width: 100%; max-width: 600px; height: auto; margin: auto; display: block;">
-	                    </td>
-	                  </tr>
-	                  <tr>
-	                    <td class="text-services" style="text-align: left;">
-	                    	<p class="meta"><span>Posted on Feb 18, 2019</span> <span>Food</span></p>
-	                    	<h3>Business Key to Success</h3>
-	                     	<p>Far far away, behind the word mountains, far from the countries</p>
-	                     	<p><a href="#" class="btn btn-primary">Read more</a></p>
-	                    </td>
-	                  </tr>
-	                </table>
-	              </td>
-	              <td valign="top" width="50%" style="padding-top: 20px; padding-left: 10px;">
-	                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-	                  <tr>
-	                    <td>
-	                      <img src="images/work-2.jpg" alt="" style="width: 100%; max-width: 600px; height: auto; margin: auto; display: block;">
-	                    </td>
-	                  </tr>
-	                  <tr>
-	                    <td class="text-services" style="text-align: left;">
-	                    	<p class="meta"><span>Posted on Feb 18, 2019</span> <span>Food</span></p>
-	                    	<h3>Web Design Technique</h3>
-	                      <p>Far far away, behind the word mountains, far from the countries</p>
-	                      <p><a href="#" class="btn btn-primary">Read more</a></p>
-	                    </td>
-	                  </tr>
-	                </table>
-	              </td>
-              </tr>
-              <tr>
-	              <td valign="top" width="50%" style="padding-top: 20px; padding-right: 10px;">
-	                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-	                  <tr>
-	                    <td>
-	                      <img src="images/work-3.jpg" alt="" style="width: 100%; max-width: 600px; height: auto; margin: auto; display: block;">
-	                    </td>
-	                  </tr>
-	                  <tr>
-	                    <td class="text-services" style="text-align: left;">
-	                    	<p class="meta"><span>Posted on Feb 18, 2019</span> <span>Food</span></p>
-	                    	<h3>Business Key to Success</h3>
-	                     	<p>Far far away, behind the word mountains, far from the countries</p>
-	                     	<p><a href="#" class="btn btn-primary">Read more</a></p>
-	                    </td>
-	                  </tr>
-	                </table>
-	              </td>
-	              <td valign="top" width="50%" style="padding-top: 20px; padding-left: 10px;">
-	                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-	                  <tr>
-	                    <td>
-	                      <img src="images/work-4.jpg" alt="" style="width: 100%; max-width: 600px; height: auto; margin: auto; display: block;">
-	                    </td>
-	                  </tr>
-	                  <tr>
-	                    <td class="text-services" style="text-align: left;">
-	                    	<p class="meta"><span>Posted on Feb 18, 2019</span> <span>Food</span></p>
-	                    	<h3>Web Design Technique</h3>
-	                      <p>Far far away, behind the word mountains, far from the countries</p>
-	                      <p><a href="#" class="btn btn-primary">Read more</a></p>
-	                    </td>
-	                  </tr>
-	                </table>
-	              </td>
-              </tr>
-              <tr>
-	              <td valign="top" width="50%" style="padding-top: 20px; padding-right: 10px;">
-	                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-	                  <tr>
-	                    <td>
-	                      <img src="images/work-5.jpg" alt="" style="width: 100%; max-width: 600px; height: auto; margin: auto; display: block;">
-	                    </td>
-	                  </tr>
-	                  <tr>
-	                    <td class="text-services" style="text-align: left;">
-	                    	<p class="meta"><span>Posted on Feb 18, 2019</span> <span>Food</span></p>
-	                    	<h3>Business Key to Success</h3>
-	                     	<p>Far far away, behind the word mountains, far from the countries</p>
-	                     	<p><a href="#" class="btn btn-primary">Read more</a></p>
-	                    </td>
-	                  </tr>
-	                </table>
-	              </td>
-	              <td valign="top" width="50%" style="padding-top: 20px; padding-left: 10px;">
-	                <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
-	                  <tr>
-	                    <td>
-	                      <img src="images/work-6.jpg" alt="" style="width: 100%; max-width: 600px; height: auto; margin: auto; display: block;">
-	                    </td>
-	                  </tr>
-	                  <tr>
-	                    <td class="text-services" style="text-align: left;">
-	                    	<p class="meta"><span>Posted on Feb 18, 2019</span> <span>Food</span></p>
-	                    	<h3>Web Design Technique</h3>
-	                      <p>Far far away, behind the word mountains, far from the countries</p>
-	                      <p><a href="#" class="btn btn-primary">Read more</a></p>
-	                    </td>
-	                  </tr>
-	                </table>
-	              </td>
-              </tr>
-          	</table>
-          </td>
-        </tr><!-- end: tr -->
+		      <td class="bg_white">
+		        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+		          <tr>
+		            <td class="bg_white email-section">
+		            	<div class="heading-section" style="text-align: center; padding: 0 30px;">
+		              	<h2>Projects</h2>
+		              	<p>A small river named Duden flows by their place and supplies it with the necessary regelialia.</p>
+		            	</div>
+		            	<table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+		            		<tr>
+                      <td valign="top" width="50%">
+                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                          <tr>
+                            <td style="padding-top: 20px; padding-right: 10px;">
+                              <a href="#"><img src="images/work-1.jpg" alt="" style="width: 100%; max-width: 600px; height: auto; margin: auto; display: block;"></a>
+                              <div class="text-project" style="text-align: center;">
+                              	<h3><a href="#">Work name</a></h3>
+                              	<span>Printing</span>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding-top: 20px; padding-right: 10px;">
+                              <a href="#"><img src="images/work-2.jpg" alt="" style="width: 100%; max-width: 600px; height: auto; margin: auto; display: block;"></a>
+                              <div class="text-project" style="text-align: center;">
+                              	<h3><a href="#">Work name</a></h3>
+                              	<span>Printing</span>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding-top: 20px; padding-right: 10px;">
+                              <a href="#"><img src="images/work-3.jpg" alt="" style="width: 100%; max-width: 600px; height: auto; margin: auto; display: block;"></a>
+                              <div class="text-project" style="text-align: center;">
+                              	<h3><a href="#">Work</a></h3>
+                              	<span>Printing</span>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding-top: 20px; padding-right: 10px;">
+                              <a href="#"><img src="images/work-4.jpg" alt="" style="width: 100%; max-width: 600px; height: auto; margin: auto; display: block;"></a>
+                              <div class="text-project" style="text-align: center;">
+                              	<h3><a href="#">Work</a></h3>
+                              	<span>Printing</span>
+                              </div>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+
+
+
+                      <td valign="top" width="50%">
+                        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                          <tr>
+                            <td style="padding-top: 20px; padding-left: 10px;">
+                              <a href="#"><img src="images/work-5.jpg" alt="" style="width: 100%; max-width: 600px; height: auto; margin: auto; display: block;"></a>
+                              <div class="text-project" style="text-align: center;">
+                              	<h3><a href="#">Work name</a></h3>
+                              	<span>Branding</span>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding-top: 20px; padding-left: 10px;">
+                              <a href="#"><img src="images/work-6.jpg" alt="" style="width: 100%; max-width: 600px; height: auto; margin: auto; display: block;"></a>
+                              <div class="text-project" style="text-align: center;">
+                              	<h3><a href="#">Work name</a></h3>
+                              	<span>Branding</span>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding-top: 20px; padding-left: 10px;">
+                              <a href="#"><img src="images/work-7.jpg" alt="" style="width: 100%; max-width: 600px; height: auto; margin: auto; display: block;"></a>
+                              <div class="text-project" style="text-align: center;">
+                              	<h3><a href="#">Work name</a></h3>
+                              	<span>Branding</span>
+                              </div>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding-top: 20px; padding-left: 10px;">
+                              <a href="#"><img src="images/work-8.jpg" alt="" style="width: 100%; max-width: 600px; height: auto; margin: auto; display: block;"></a>
+                              <div class="text-project" style="text-align: center;">
+                              	<h3><a href="#">Work name</a></h3>
+                              	<span>Branding</span>
+                              </div>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+		            	</table>
+		            </td>
+		          </tr><!-- end: tr -->
+
+		        </table>
+
+		      </td>
+		    </tr><!-- end:tr -->
       <!-- 1 Column Text + Button : END -->
       </table>
       <table align="center" role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="margin: auto;">
@@ -477,7 +444,7 @@ table{
                       	<h3 class="heading">Contact Info</h3>
                       	<ul>
 					                <li><span class="text">203 Fake St. Mountain View, San Francisco, California, USA</span></li>
-					                <li><span class="text">+2 392 3929 210</span></a></li>
+					                <li><span class="text"><a href="tel:+2 392 3929 210">+2 392 3929 210</span></a></li>
 					              </ul>
                       </td>
                     </tr>
@@ -510,7 +477,7 @@ table{
                   <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
                     <tr>
                       <td style="text-align: left; padding-right: 10px;">
-                      	<p>&copy; 2018 Stories. All Rights Reserved</p>
+                      	<p>&copy; 2018 Agency. All Rights Reserved</p>
                       </td>
                     </tr>
                   </table>

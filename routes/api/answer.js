@@ -39,6 +39,8 @@ router.post('/create', passport.authenticate('jwt', { session: false }), (req, r
   answerFields.user = req.user.id;
   if(req.body.body) answerFields.body = req.body.body;
   if(req.body.question_id) answerFields.question = req.body.question_id;
+  answerFields.upvotes = [];
+  answerFields.downvotes = [];
 
   //check if user exists
   // Check if user exists
@@ -76,7 +78,7 @@ router.post('/create', passport.authenticate('jwt', { session: false }), (req, r
       }
 
     }).catch(err => console.log(err));
-  }).catch(err => res.json({nouser: 'User does not exist'}));
+  }).catch(err => res.status(404).json({nouser: 'User does not exist'}));
 
 })
 
@@ -89,8 +91,8 @@ router.delete('/delete/:id', passport.authenticate('jwt', {session: false}), (re
     // wtf i need to check if the question was posted by the user
     Answer.findOne({_id: req.params.id})
       .then(answer => {
-        // Check if question was posted by user
-        if ( answer.user._id.toString() === req.user.id.toString() ) {
+        // Check if answer was posted by user
+        if ( answer.user._id.toString() === req.user.id.toString() || req.user.status === 7 ) {
           Answer.deleteOne({_id: req.params.id}).then(msg => {
             Question.findOne({_id: answer.question.toString()})
               .then(question => {
@@ -100,7 +102,7 @@ router.delete('/delete/:id', passport.authenticate('jwt', {session: false}), (re
                   question.answers.splice(removeIndex, 1);
                   if(question.best_answer && question.best_answer.toString() === req.params.id) question.best_answer = null;
                   // Save the post
-                  question.save().then(question => res.json(msg));
+                  question.save().then(msg => res.json(msg));
                   // finally
               })
 
@@ -141,7 +143,7 @@ router.get('/upvote/:id', passport.authenticate('jwt', { session: false }), (req
   //check if user profile exists
   Profile.findOne({user: req.user.id}).then(profile => {
     Answer.findOne({_id: req.params.id}).then(answer => {
-      if(!answer) res.json({noanswer: 'Answer not found'});
+      if(!answer) res.status(404).json({noanswer: 'Answer not found'});
         //check if question is already upvoted
         notifyFor.user = answer.user;
         if(answer.upvotes.filter(upvote => upvote.user.toString() === req.user.id).length > 0){
@@ -201,7 +203,7 @@ router.get('/downvote/:id', passport.authenticate('jwt', { session: false }), (r
   //check if user profile exists
   Profile.findOne({user: req.user.id}).then(profile => {
     Answer.findOne({_id: req.params.id}).then(answer => {
-      if(!answer) res.json({noanswer: 'Answer not found'});
+      if(!answer) res.status(404).json({noanswer: 'Answer not found'});
         notifyFor.user = answer.user;
         //check if question is already downvoted
         if(answer.downvotes.filter(downvote => downvote.user.toString() === req.user.id).length > 0){
@@ -272,13 +274,13 @@ router.post('/comment/add', passport.authenticate('jwt', { session: false }), (r
   //check if user exists
   Profile.findOne({user: req.user.id})
     .then(profile => {
-      if(!profile) return res.json({noprofile: 'User not found'});
+      if(!profile) return res.status(404).json({noprofile: 'User not found'});
       Answer.findOne({_id: req.body.answer_id})
         .populate({
           path: 'comments.user'
         })
         .then(answer => {
-          if(!answer) return res.json({noanswer: 'Answer not found'});
+          if(!answer) return res.status(404).json({noanswer: 'Answer not found'});
           notifyFor.user = answer.user;
           //save the comment
           answer.comments.push(commentFields);
@@ -295,8 +297,8 @@ router.post('/comment/add', passport.authenticate('jwt', { session: false }), (r
                 res.json(question);
               })
           });
-        }).catch(err => res.json({noanswer: 'Answer not found'}))
-    }).catch(err => res.json({nouser: 'User not found'}))
+        }).catch(err => res.status(404).json({noanswer: 'Answer not found'}))
+    }).catch(err => res.status(404).json({nouser: 'User not found'}))
 })
 
 // @route   POST api/answer/comment/delete
@@ -307,17 +309,19 @@ router.post('/comment/delete', passport.authenticate('jwt', { session: false }),
   //check if user exists
   Profile.findOne({user: req.user.id})
     .then(profile => {
-      if(!profile) return res.json({noprofile: 'User not found'});
-      Answer.findOne({_id: req.body.answer_id})
+      //if(!profile) return res.status(404).json({noprofile: 'User not found'});
+      Answer.findById(req.body.answer_id)
         .populate({
           path: 'comments.user'
         })
         .then(answer => {
-          if(!answer) return res.json({noanswer: 'Answer not found'});
+          if(!answer) return res.status(404).json({noanswer: 'Answer not found'});
           //check if comment exists
           if(!answer.comments.filter(comment => comment._id.toString() === req.body.comment_id).length > 0) res.json({nocomment: 'Comment does not exist'})
           // Get the remove index
           const removeIndex = answer.comments.map(comment => comment._id.toString()).indexOf(req.body.comment_id);
+          // check if the comment was by the user
+          if(!(answer.comments[removeIndex].user._id.toString() === req.user.id || req.user.status === 7)) return res.status(400).json({error: 'Unauthorized'});
           // Splice it out of the array
           answer.comments.splice(removeIndex, 1);
           // save the answer
@@ -333,8 +337,8 @@ router.post('/comment/delete', passport.authenticate('jwt', { session: false }),
                 res.json(question);
               })
           })
-        }).catch(err => res.json({noanswer: 'Answer not found'}))
-    }).catch(err => res.json({nouser: 'User not found'}))
+        }).catch(err => res.status(404).json({noanswer: 'Answer not found'}))
+    }).catch(err => res.status(404).json({nouser: 'User not found'}))
 })
 
 // @route   POST api/answer/report/:id
@@ -364,7 +368,7 @@ router.post('/report/:id', passport.authenticate('jwt', { session: false}), (req
       // Save the report
       new Reported(reportFields).save().then(reported => res.json(reported));
 
-    }).catch(err => res.json(err))
+    }).catch(err => res.status(404).json(err))
   })
 })
 

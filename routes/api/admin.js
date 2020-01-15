@@ -33,7 +33,7 @@ router.get('/test', (req, res) => res.json({msg: 'question Works!'}));
 // @desc    Tests question route
 // @access  public
 router.get('/overview', passport.authenticate('jwt', { session: false }), (req, res) => {
-  //if(req.user.status !== 7) res.status(400).json({error: 'Not Admin'});
+  if(req.user.status !== 7) res.status(400).json({error: 'Unauthorized'})
   let data = {};
   Profile.find()
     .populate('user', ['name', 'avatar', 'email', 'date'])
@@ -76,6 +76,19 @@ router.delete('/delete/user/:id', passport.authenticate('jwt', { session: false}
       });
     })
   })
+
+// @route   POST api/admin/disable/user/:id
+// @desc    Disable a user
+// @access  private
+router.get('/disable/user/:id', passport.authenticate('jwt', { session: false}), (re, res) => {
+  if(req.user.status !== 7) res.status(400).json({error: 'Unauthorized'})
+  User.findById(req.params.id)
+    .then(user => {
+      user.status = 0;
+      user.save()
+        .then(user => res.json(user))
+    })
+})
 
 
 module.exports = router;

@@ -17,7 +17,7 @@ const admin = require('./routes/api/admin');
 // const upload = require('./routes/api/upload');
 
 // const notify = require('./functions/Notify');
-//      triggeredBy, reaction,  type,          link,             triggeredFor
+//      triggeredBy, reaction,  type,          link,             triggeredFor questionId
 // notify('John Dee', 'Liked', 'Question', 'link/to/notification', 'Dakup Nengak');
 
 const app = express();
@@ -58,3 +58,4 @@ const port = process.env.PORT || 4000;
 app.listen(port, () => {
     console.log(`App has Started on port ${port}`);
 });
+

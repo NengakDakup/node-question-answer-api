@@ -22,7 +22,7 @@ const User = require('../../models/User');
 // Load Answer Model
 const Answer = require('../../models/Answer');
 // Load Report Model
-const Reported = require('../../models/Reported')
+const Reported = require('../../models/Reported');
 
 // @route   GET api/question/test
 // @desc    Tests question route
@@ -198,7 +198,7 @@ router.delete('/delete/:id', passport.authenticate('jwt', { session: false}), (r
       .populate('user')
       .then(question => {
         // Check if question was posted by user
-        if ( question.user._id.toString() === req.user.id.toString() ) {
+        if ( question.user._id.toString() === req.user.id.toString() || req.user.status === 7) {
           Question.remove({_id: req.params.id}).then(msg => res.json(msg));
         } else {
           return res.status(400).json({unauthorized: 'Unauthorized'});
