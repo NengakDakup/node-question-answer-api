@@ -13,6 +13,7 @@ const question = require('./routes/api/question');
 const answer = require('./routes/api/answer');
 const search = require('./routes/api/search');
 const notification = require('./routes/api/notification');
+const category = require('./routes/api/category');
 const admin = require('./routes/api/admin');
 // const upload = require('./routes/api/upload');
 
@@ -48,6 +49,7 @@ app.use('/api/profile', profile);
 app.use('/api/question', question);
 app.use('/api/answer', answer);
 app.use('/api/search', search);
+app.use('/api/category', category);
 app.use('/api/notification', notification);
 app.use('/api/admin', admin);
 // app.use('/api/upload', upload);
@@ -58,4 +60,3 @@ const port = process.env.PORT || 4000;
 app.listen(port, () => {
     console.log(`App has Started on port ${port}`);
 });
-
