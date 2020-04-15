@@ -10,6 +10,9 @@ const CategorySchema = new Schema({
     description: {
       type: String
     },
+    image: {
+      type: String
+    },
     date: {
         type: Date,
         default: Date.now()

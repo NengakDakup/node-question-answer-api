@@ -272,7 +272,7 @@ router.post('/comment/add', passport.authenticate('jwt', { session: false }), (r
   if(req.body.answer_id) commentFields.question = req.body.answer_id;
 
   //check if user exists
-  Profile.findOne({user: req.user.id})
+  User.findOne({_id: req.user.id})
     .then(profile => {
       if(!profile) return res.status(404).json({noprofile: 'User not found'});
       Answer.findOne({_id: req.body.answer_id})

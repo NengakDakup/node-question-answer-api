@@ -29,7 +29,7 @@ router.get('/test', (req, res) => res.json({msg: 'profile Works!'}));
 router.get('/', passport.authenticate('jwt', { session: false }), (req, res) => {
   const errors = {};
   Profile.findOne({ user: req.user.id})
-    .populate('user', ['name', 'avatar'])
+    .populate('user'/**, ['name', 'avatar', 'email']**/)
     .then(profile => {
       if(!profile){
         errors.noprofile = 'There is no profile for this user';
@@ -177,6 +177,10 @@ router.post('/create', passport.authenticate('jwt', { session: false }), (req, r
 router.get('/follow/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
   Profile.findOne({user: req.user.id}).then(profile => {
     Profile.findOne({user: req.params.id}).then(profile => {
+      console.log(profile.user);
+      console.log(req.user.id);
+      // check if user is trying to follow him/her self...
+      if(profile.user === req.user.id) return res.status(400).json({error: "Cant Follow"});
       // check if question exists
       if(!profile) res.json({noprofile: 'Profile not found'})
       notifyFor.user = profile.user;
